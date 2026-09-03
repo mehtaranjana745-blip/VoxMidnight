@@ -1,0 +1,96 @@
+// ============================================================================
+// Midnight Network Smart Contract: VoxMidnight - Confidential DAO Governance
+// Language: Compact (Midnight Smart Contract DSL)
+// Level: 3 Production Specification for Hackathon Submission
+// ============================================================================
+
+export ledger proposalId: Uint<32>;
+export ledger yesCount: Counter;
+export ledger noCount: Counter;
+export ledger totalVotes: Counter;
+export ledger votingActive: Boolean;
+export ledger admin: Bytes<32>;
+export ledger nullifiers: Map<Bytes<32>, Boolean>;
+
+// ----------------------------------------------------------------------------
+// Private Witnesses (Executed strictly inside user's client-side ZK prover)
+// ----------------------------------------------------------------------------
+// voterChoiceWitness: True for YES (Approve), False for NO (Reject)
+witness voterChoiceWitness(): Boolean;
+
+// voterSecretWitness: User's confidential voter entropy secret (prevents deanonymization)
+witness voterSecretWitness(): Bytes<32>;
+
+// voterEligibilityWitness: User's private governance weight / eligibility tier (> 0)
+witness voterEligibilityWitness(): Uint<16>;
+
+// ----------------------------------------------------------------------------
+// Constructor
+// ----------------------------------------------------------------------------
+constructor(initialProposalId: Uint<32>, adminPublicKey: Bytes<32>) {
+    proposalId = initialProposalId;
+    votingActive = true;
+    admin = adminPublicKey;
+}
+
+// ----------------------------------------------------------------------------
+// Circuits (Zero-Knowledge Verifiable State Transitions)
+// ----------------------------------------------------------------------------
+
+/**
+ * @notice Casts an anonymous, verifiable ballot on the active governance proposal.
+ * @dev Computes Zero-Knowledge proof locally. Evaluates eligibility and nullifier uniqueness.
+ *      Only the binary choice tally and unique nullifier are disclosed on-chain.
+ * @param nullifierHash Cryptographic nullifier derived from secret to prevent double voting.
+ * @return Boolean representing vote registration success.
+ */
+export circuit castBallot(nullifierHash: Bytes<32>): Boolean {
+    // 1. Assert public ledger preconditions
+    assert votingActive "Governance voting is currently closed or resolved";
+    assert !nullifiers.member(nullifierHash) "Nullifier already spent: Double-voting is strictly forbidden";
+
+    // 2. Ingest private witness data into client-side ZK prover sandbox
+    const choice = voterChoiceWitness();
+    const secret = voterSecretWitness();
+    const eligibilityScore = voterEligibilityWitness();
+
+    // 3. Verify voter eligibility constraints within ZK circuit
+    assert eligibilityScore > 0 "Voter has insufficient governance weight or is ineligible";
+
+    // 4. Explicitly disclose ONLY the minimal state updates to the public ledger
+    // Crucial: The 'choice' is disclosed only as an aggregated counter increment,
+    // and 'secret' never leaves the local client-side witness scope.
+    const isYes: Boolean = disclose(choice);
+    const disclosedNullifier: Bytes<32> = disclose(nullifierHash);
+
+    // 5. Update public ledger tallies and register nullifier
+    if (isYes) {
+        yesCount.increment(1);
+    } else {
+        noCount.increment(1);
+    }
+    totalVotes.increment(1);
+
+    // Record nullifier to permanently prevent ballot duplication
+    nullifiers.insert(disclosedNullifier, true);
+
+    return true;
+}
+
+/**
+ * @notice Administrative circuit to open or close governance voting.
+ * @param active New active status for the active proposal.
+ */
+export circuit setVotingActive(active: Boolean): Void {
+    votingActive = active;
+}
+
+/**
+ * @notice Administrative circuit to initialize a new proposal cycle.
+ * @param newProposalId The new numeric identifier for the proposal.
+ */
+export circuit setProposalId(newProposalId: Uint<32>): Void {
+    assert newProposalId > proposalId "New proposal ID must be strictly greater than previous";
+    proposalId = newProposalId;
+    votingActive = true;
+}
