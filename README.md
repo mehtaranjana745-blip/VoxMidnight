@@ -45,6 +45,14 @@
 | **8. Automated Unit/Integration Tests** | ✅ 4/4 Passed | [`test/vox_midnight.test.ts`](./test/vox_midnight.test.ts) (`npm run test`) |
 | **9. GitHub Actions CI/CD Pipeline** | ✅ Complete | [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) |
 | **10. Privacy Model & Level-3 Proposal** | ✅ Complete | Documented in full below |
+| **11. Video Demonstration** | ✅ Available | [Watch Live Video Demo](https://photos.app.goo.gl/2boiahufVASndXLM8) |
+
+---
+
+## 🎥 Video Demonstration & Walkthrough
+
+- **Video Walkthrough**: [https://photos.app.goo.gl/2boiahufVASndXLM8](https://photos.app.goo.gl/2boiahufVASndXLM8)  
+  *Watch a comprehensive end-to-end walkthrough of client-side Zero-Knowledge proof generation, Midnight Lace wallet connectivity, on-chain anonymous ballot casting, nullifier derivation, and real-time verifiable tally updates on Midnight Preprod.*
 
 ---
 
