@@ -2,10 +2,49 @@
 
 **Level-3 Compliant Decentralized Anonymous Governance Protocol on Midnight Network**
 
-[![CI](https://github.com/mehtaranjana745-blip/VoxMidnight/actions/workflows/ci.yml/badge.svg)](https://github.com/mehtaranjana745-blip/VoxMidnight/actions/workflows/ci.yml)
-[![Midnight Preprod](https://img.shields.io/badge/Midnight-Preprod%20Verified-00f2fe.svg)](https://midnight.network)
-[![Smart Contract](https://img.shields.io/badge/Language-Compact%20DSL-4facfe.svg)](https://docs.midnight.network)
-[![License](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
+> **Midnight Network Hackathon — Level-3 Project Submission**  
+> **Project Name**: VoxMidnight  
+> **Concept**: Private On-Chain Governance & Verifiable Anonymous Balloting  
+> **Smart Contract Language**: Compact DSL | **Zero-Knowledge Proofs**: Halo2 / PLONK | **Frontend**: Next.js 14, React 18, Tailwind CSS, Lucide Icons  
+> **GitHub Repository**: [https://github.com/mehtaranjana745-blip/VoxMidnight](https://github.com/mehtaranjana745-blip/VoxMidnight)  
+> [![Midnight CI/CD Pipeline](https://github.com/mehtaranjana745-blip/VoxMidnight/actions/workflows/ci.yml/badge.svg)](https://github.com/mehtaranjana745-blip/VoxMidnight/actions)
+> [![Midnight Preprod](https://img.shields.io/badge/Midnight-Preprod%20Verified-00f2fe.svg)](https://midnight.network)
+> [![Smart Contract](https://img.shields.io/badge/Language-Compact%20DSL-4facfe.svg)](https://docs.midnight.network)
+> [![License](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
+
+---
+
+## 🌐 Deployed Network & Contract Information (Reviewer Reference)
+
+| Parameter | Value |
+| :--- | :--- |
+| **Contract Name** | `VoxMidnightContract` |
+| **Contract ID (Preprod Address)** | `020089aef41c5d983e2e50529d8137ba93d0c268c1387d894819dcf47343e8a49c` |
+| **Contract Identifier** | `mn_contract_vox_midnight_020089aef41c5d983e2e50529d8137ba93d0c268c1387d894819dcf47343e8a49c` |
+| **Network** | `Midnight Preprod (Testnet)` |
+| **Admin Public Key** | `03a89e47c92b8d5e0a12f94b3218c5e94b291da93842b10928a47291a0c847e92` |
+| **Active Proposal ID** | `#042` (`MIP-042: Implement Threshold Sharded Indexing`) |
+| **Proof System** | Halo2 / PLONK with Single-Use Cryptographic Nullifiers |
+| **Indexer Endpoint** | `https://indexer.preprod.midnight.network/api/v1/graphql` |
+| **Preprod Node RPC** | `https://rpc.preprod.midnight.network` |
+| **Local Proof Server** | `http://localhost:6300` |
+
+---
+
+## 📋 Hackathon Deliverables & Reviewer Verification Checklist
+
+| Requirement | Status | File Location / Proof |
+| :--- | :---: | :--- |
+| **1. Compact Smart Contract** | ✅ Complete | [`contract/vox_midnight.compact`](./contract/vox_midnight.compact) |
+| **2. Private Witness Ingestion** | ✅ Complete | `witness voterChoiceWitness(): Boolean`, `voterSecretWitness(): Bytes<32>`, `voterEligibilityWitness(): Uint<16>` |
+| **3. Selective `disclose()` Usage** | ✅ Complete | `disclose(choice)` & `disclose(nullifierHash)` (Only public tallies & nullifier are revealed; voter secret and ballot identity remain confidential) |
+| **4. Public Ledger State** | ✅ Complete | `proposalId`, `yesCount`, `noCount`, `totalVotes`, `votingActive`, `admin`, `nullifiers` |
+| **5. Managed Compilation Artifacts** | ✅ Complete | [`src/contract/managed/`](./src/contract/managed/) generated via `npm run compile:contract` |
+| **6. Lace Wallet & Midnight.js Integration** | ✅ Complete | [`src/midnight/laceConnector.ts`](./src/midnight/laceConnector.ts) & [`src/midnight/contractClient.ts`](./src/midnight/contractClient.ts) |
+| **7. Lunar Teal & Obsidian UI** | ✅ Complete | [`src/components/`](./src/components/) (Voting Booth, Proposal Card, ZK Stepper Modal, Proof Visualizer, Activity Ledger, Compact Viewer) |
+| **8. Automated Unit/Integration Tests** | ✅ 4/4 Passed | [`test/vox_midnight.test.ts`](./test/vox_midnight.test.ts) (`npm run test`) |
+| **9. GitHub Actions CI/CD Pipeline** | ✅ Complete | [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) |
+| **10. Privacy Model & Level-3 Proposal** | ✅ Complete | Documented in full below |
 
 ---
 
