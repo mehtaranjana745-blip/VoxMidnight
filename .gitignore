@@ -22,6 +22,12 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# scripts and demo scripts
+/scripts/
+*script*
+*.sh
+*.ps1
+
 # local env files
 .env
 .env*.local
