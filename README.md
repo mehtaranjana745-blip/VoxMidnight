@@ -6,6 +6,7 @@
 > **Project Name**: VoxMidnight  
 > **Concept**: Private On-Chain Governance & Verifiable Anonymous Balloting  
 > **Smart Contract Language**: Compact DSL | **Zero-Knowledge Proofs**: Halo2 / PLONK | **Frontend**: Next.js 14, React 18, Tailwind CSS, Lucide Icons  
+> **Live Web Application**: [https://vox-midnight.vercel.app/](https://vox-midnight.vercel.app/)  
 > **GitHub Repository**: [https://github.com/mehtaranjana745-blip/VoxMidnight](https://github.com/mehtaranjana745-blip/VoxMidnight)  
 > [![Midnight CI/CD Pipeline](https://github.com/mehtaranjana745-blip/VoxMidnight/actions/workflows/ci.yml/badge.svg)](https://github.com/mehtaranjana745-blip/VoxMidnight/actions)
 > [![Midnight Preprod](https://img.shields.io/badge/Midnight-Preprod%20Verified-00f2fe.svg)](https://midnight.network)
@@ -21,6 +22,7 @@
 | **Contract Name** | `VoxMidnightContract` |
 | **Contract ID (Preprod Address)** | `020089aef41c5d983e2e50529d8137ba93d0c268c1387d894819dcf47343e8a49c` |
 | **Contract Identifier** | `mn_contract_vox_midnight_020089aef41c5d983e2e50529d8137ba93d0c268c1387d894819dcf47343e8a49c` |
+| **Live Deployed Web App** | [https://vox-midnight.vercel.app/](https://vox-midnight.vercel.app/) |
 | **Network** | `Midnight Preprod (Testnet)` |
 | **Admin Public Key** | `03a89e47c92b8d5e0a12f94b3218c5e94b291da93842b10928a47291a0c847e92` |
 | **Active Proposal ID** | `#042` (`MIP-042: Implement Threshold Sharded Indexing`) |
@@ -45,12 +47,14 @@
 | **8. Automated Unit/Integration Tests** | ✅ 4/4 Passed | [`test/vox_midnight.test.ts`](./test/vox_midnight.test.ts) (`npm run test`) |
 | **9. GitHub Actions CI/CD Pipeline** | ✅ Complete | [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) |
 | **10. Privacy Model & Level-3 Proposal** | ✅ Complete | Documented in full below |
-| **11. Video Demonstration** | ✅ Available | [Watch Live Video Demo](https://photos.app.goo.gl/2boiahufVASndXLM8) |
+| **11. Live Deployed Web App** | ✅ Online | [https://vox-midnight.vercel.app/](https://vox-midnight.vercel.app/) |
+| **12. Video Demonstration** | ✅ Available | [Watch Live Video Demo](https://photos.app.goo.gl/2boiahufVASndXLM8) |
 
 ---
 
-## 🎥 Video Demonstration & Walkthrough
+## 🚀 Live Demo & Video Walkthrough
 
+- **Live Deployed Web Application**: [https://vox-midnight.vercel.app/](https://vox-midnight.vercel.app/)
 - **Video Walkthrough**: [https://photos.app.goo.gl/2boiahufVASndXLM8](https://photos.app.goo.gl/2boiahufVASndXLM8)  
   *Watch a comprehensive end-to-end walkthrough of client-side Zero-Knowledge proof generation, Midnight Lace wallet connectivity, on-chain anonymous ballot casting, nullifier derivation, and real-time verifiable tally updates on Midnight Preprod.*
 
