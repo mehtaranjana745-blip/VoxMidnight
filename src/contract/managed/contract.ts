@@ -9,12 +9,12 @@ export class VoxMidnightContractImpl {
   private ledgerState: LedgerState;
   private witnesses?: PrivateWitnesses;
 
-  constructor(initialProposalId: bigint = 42n, adminPublicKey: Uint8Array = new Uint8Array(32)) {
+  constructor(initialProposalId: bigint = BigInt(42), adminPublicKey: Uint8Array = new Uint8Array(32)) {
     this.ledgerState = {
       proposalId: initialProposalId,
-      yesCount: 142n,
-      noCount: 23n,
-      totalVotes: 165n,
+      yesCount: BigInt(142),
+      noCount: BigInt(23),
+      totalVotes: BigInt(165),
       votingActive: true,
       admin: adminPublicKey,
       nullifiers: new Map<string, boolean>(),
@@ -52,11 +52,11 @@ export class VoxMidnightContractImpl {
       
       // Simulate Compact disclose() behavior: Only tally updates and nullifier are exposed on-chain
       if (choice) {
-        this.ledgerState.yesCount += 1n;
+        this.ledgerState.yesCount += BigInt(1);
       } else {
-        this.ledgerState.noCount += 1n;
+        this.ledgerState.noCount += BigInt(1);
       }
-      this.ledgerState.totalVotes += 1n;
+      this.ledgerState.totalVotes += BigInt(1);
       this.ledgerState.nullifiers.set(nullifierHex, true);
 
       return true;

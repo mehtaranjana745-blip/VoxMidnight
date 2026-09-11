@@ -30,8 +30,8 @@ describe("VoxMidnight Compact Smart Contract & ZK Governance Test Suite", () => 
     expect(result).toBe(true);
 
     const updatedState = await contract.queryLedgerState();
-    expect(updatedState.yesCount).toBe(initialYes + 1n);
-    expect(updatedState.totalVotes).toBe(initialTotal + 1n);
+    expect(updatedState.yesCount).toBe(initialYes + BigInt(1));
+    expect(updatedState.totalVotes).toBe(initialTotal + BigInt(1));
     expect(updatedState.nullifiers.has(nullifierHex.replace("0x", ""))).toBe(true);
   });
 
