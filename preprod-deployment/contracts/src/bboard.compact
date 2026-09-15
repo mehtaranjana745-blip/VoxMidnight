@@ -37,8 +37,10 @@ constructor(initialProposalId: Uint<32>, adminPublicKey: Bytes<32>) {
 // ----------------------------------------------------------------------------
 
 export circuit castBallot(nullifierHash: Bytes<32>): [] {
+    const disclosedNullifier: Bytes<32> = disclose(nullifierHash);
+
     assert(votingActive, "Governance voting is currently closed or resolved");
-    assert(!nullifiers.member(nullifierHash), "Nullifier already spent: Double-voting is strictly forbidden");
+    assert(!nullifiers.member(disclosedNullifier), "Nullifier already spent: Double-voting is strictly forbidden");
 
     const choice = voterChoiceWitness();
     const secret = voterSecretWitness();
@@ -47,7 +49,6 @@ export circuit castBallot(nullifierHash: Bytes<32>): [] {
     assert(eligibilityScore > 0, "Voter has insufficient governance weight or is ineligible");
 
     const isYes: Boolean = disclose(choice);
-    const disclosedNullifier: Bytes<32> = disclose(nullifierHash);
 
     if (isYes) {
         yesCount.increment(1);
@@ -64,7 +65,8 @@ export circuit setVotingActive(active: Boolean): [] {
 }
 
 export circuit setProposalId(newProposalId: Uint<32>): [] {
-    assert(newProposalId > proposalId, "New proposal ID must be strictly greater than previous");
-    proposalId = disclose(newProposalId);
+    const disclosedProposalId = disclose(newProposalId);
+    assert(disclosedProposalId > proposalId, "New proposal ID must be strictly greater than previous");
+    proposalId = disclosedProposalId;
     votingActive = true;
 }
