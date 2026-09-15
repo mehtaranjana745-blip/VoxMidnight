@@ -12,7 +12,7 @@
 > [![Midnight Preprod](https://img.shields.io/badge/Midnight-Preprod%20Verified-00f2fe.svg)](https://midnight.network)
 > [![Smart Contract](https://img.shields.io/badge/Language-Compact%20DSL-4facfe.svg)](https://docs.midnight.network)
 > [![License](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
-
+. **Product Twitter/X handle** : [https://x.com/voxmidnight](https://x.com/voxmidnight)
 ---
 
 ## 🌐 Deployed Network & Contract Information (Reviewer Reference)
