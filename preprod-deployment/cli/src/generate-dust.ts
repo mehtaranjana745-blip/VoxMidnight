@@ -22,22 +22,26 @@ import { HDWallet, Roles } from '@midnight-ntwrk/wallet-sdk-hd';
 import { getNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
 import * as rx from 'rxjs';
 
-export const getUnshieldedSeed = (seed: string): Uint8Array<ArrayBufferLike> => {
-  const seedBuffer = Buffer.from(seed, 'hex');
-  const hdWalletResult = HDWallet.fromSeed(seedBuffer);
+import { WalletSeeds } from '@midnight-ntwrk/testkit-js';
 
-  const { hdWallet } = hdWalletResult as {
-    type: 'seedOk';
-    hdWallet: HDWallet;
-  };
-
-  const derivationResult = hdWallet.selectAccount(0).selectRole(Roles.NightExternal).deriveKeyAt(0);
-
-  if (derivationResult.type === 'keyOutOfBounds') {
-    throw new Error('Key derivation out of bounds');
+export const getUnshieldedSeed = (seed: string): Uint8Array => {
+  const trimmed = seed.trim();
+  if (trimmed.includes(' ')) {
+    return WalletSeeds.fromMnemonic(trimmed).unshielded;
   }
+  try {
+    const seedBuffer = Buffer.from(trimmed, 'hex');
+    const hdWalletResult = HDWallet.fromSeed(seedBuffer);
 
-  return derivationResult.key;
+    if ((hdWalletResult as any).type === 'seedOk' && (hdWalletResult as any).hdWallet) {
+      const derivationResult = (hdWalletResult as any).hdWallet.selectAccount(0).selectRole(Roles.NightExternal).deriveKeyAt(0);
+      if (derivationResult.type !== 'keyOutOfBounds') {
+        return derivationResult.key;
+      }
+    }
+  } catch {}
+
+  return WalletSeeds.fromMasterSeed(trimmed).unshielded;
 };
 
 export const generateDust = async (
