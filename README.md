@@ -20,8 +20,8 @@
 | Parameter | Value |
 | :--- | :--- |
 | **Contract Name** | `VoxMidnightContract` |
-| **Contract ID (Preprod Address)** | `020089aef41c5d983e2e50529d8137ba93d0c268c1387d894819dcf47343e8a49c` |
-| **Contract Identifier** | `mn_contract_vox_midnight_020089aef41c5d983e2e50529d8137ba93d0c268c1387d894819dcf47343e8a49c` |
+| **Contract Address (Preprod)** | `a981220ce45583f2d9912ebaab5c33cc7a5546f3ff1ac036776d3972a43c5448` |
+| **Midnight Explorer URL** | [https://preprod.midnight.network/contract/a981220ce45583f2d9912ebaab5c33cc7a5546f3ff1ac036776d3972a43c5448](https://preprod.midnight.network/contract/a981220ce45583f2d9912ebaab5c33cc7a5546f3ff1ac036776d3972a43c5448) |
 | **Live Deployed Web App** | [https://vox-midnight.vercel.app/](https://vox-midnight.vercel.app/) |
 | **Network** | `Midnight Preprod (Testnet)` |
 | **Admin Public Key** | `03a89e47c92b8d5e0a12f94b3218c5e94b291da93842b10928a47291a0c847e92` |
