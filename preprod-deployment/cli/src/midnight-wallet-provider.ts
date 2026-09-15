@@ -138,7 +138,13 @@ export class MidnightWalletProvider implements MidnightProvider, WalletProvider 
       },
     };
 
-    const seeds = seed ? WalletSeeds.fromMasterSeed(seed) : WalletSeeds.generateRandom();
+    let seeds: WalletSeeds;
+    if (seed) {
+      const trimmed = seed.trim();
+      seeds = trimmed.includes(' ') ? WalletSeeds.fromMnemonic(trimmed) : WalletSeeds.fromMasterSeed(trimmed);
+    } else {
+      seeds = WalletSeeds.generateRandom();
+    }
     const keystore = createKeystore(seeds.unshielded, env.walletNetworkId as any);
 
     const unshieldedWallet = WalletFactory.createUnshieldedWallet(walletConfig as any, keystore);
