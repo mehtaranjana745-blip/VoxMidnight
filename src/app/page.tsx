@@ -11,7 +11,14 @@ import { CompactCircuitViewer } from "../components/CompactCircuitViewer";
 import { MidnightLaceConnector } from "../midnight/laceConnector";
 import { VoxMidnightClient } from "../midnight/contractClient";
 import { WalletState, ZKProofProgress, GovernanceProposal, VoteActivity } from "../midnight/types";
-import { Shield, Sparkles, Lock, Cpu, Globe, ArrowRight } from "lucide-react";
+import { Shield, BarChart3, Layers, RefreshCw, Search } from "lucide-react";
+
+const STATS = [
+  { label: "Total Ballots Cast", value: "165", delta: "+12 today" },
+  { label: "Quorum Progress", value: "66%", delta: "165 / 250" },
+  { label: "Approval Rate", value: "86%", delta: "142 yes / 23 no" },
+  { label: "Active Proposals", value: "1", delta: "Preprod" },
+];
 
 export default function Home() {
   const [wallet, setWallet] = useState<WalletState>({
@@ -25,11 +32,10 @@ export default function Home() {
   const client = VoxMidnightClient.getInstance();
   const [proposal, setProposal] = useState<GovernanceProposal>(client.getProposal());
   const [activities, setActivities] = useState<VoteActivity[]>(client.getActivities());
-
-  // ZK Modal state
   const [isVoting, setIsVoting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [proofProgress, setProofProgress] = useState<ZKProofProgress | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleConnectWallet = async () => {
     setWallet((prev) => ({ ...prev, isConnecting: true }));
@@ -47,13 +53,8 @@ export default function Home() {
   const handleCastVote = async (choice: boolean, salt: Uint8Array) => {
     setIsVoting(true);
     setIsModalOpen(true);
-
     try {
-      await client.castConfidentialVote(choice, salt, (progress) => {
-        setProofProgress(progress);
-      });
-
-      // Refresh proposal and activity state
+      await client.castConfidentialVote(choice, salt, (progress) => { setProofProgress(progress); });
       setProposal(client.getProposal());
       setActivities(client.getActivities());
     } catch (err: any) {
@@ -65,43 +66,82 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen pb-20">
-      {/* Top Navigation */}
-      <Navbar
-        wallet={wallet}
-        onConnect={handleConnectWallet}
-        onDisconnect={handleDisconnectWallet}
-      />
+    <main style={{ minHeight: "100vh", paddingBottom: "48px" }}>
+      {/* Nav */}
+      <Navbar wallet={wallet} onConnect={handleConnectWallet} onDisconnect={handleDisconnectWallet} />
 
-      {/* Hero Header Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-8">
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-lunar-teal/10 border border-lunar-teal/30 text-lunar-teal text-xs font-semibold tracking-wide">
-            <Sparkles className="w-3.5 h-3.5 animate-spin" />
-            <span>Midnight Network Preprod • Zero-Knowledge Governance</span>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* ── Page Header ── */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 py-7">
+          <div>
+            <h1
+              className="section-header flex items-center gap-2"
+              style={{ color: "#f0fdf0" }}
+            >
+              VoxMidnight governance explorer
+            </h1>
+            <p className="text-sm mt-1" style={{ color: "#4b7a54" }}>
+              Private on-chain balloting powered by Zero-Knowledge proofs on Midnight Preprod
+            </p>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-            Confidential Balloting. <br />
-            <span className="text-gradient-teal">Verifiable On-Chain Consensus.</span>
-          </h1>
-
-          <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-normal max-w-2xl mx-auto">
-            Cast anonymous governance ballots using private Zero-Knowledge witnesses. Your choice and identity remain cryptographically isolated in your browser while updating the public tally.
-          </p>
+          <div className="flex items-center gap-2">
+            <button className="btn-ghost flex items-center gap-1.5 text-sm">
+              <RefreshCw className="w-3.5 h-3.5" />
+              Refresh
+            </button>
+            <div
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold"
+              style={{ background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.2)", color: "#4ade80" }}
+            >
+              <span className="live-dot" style={{ width: "6px", height: "6px" }} />
+              <span>Preprod</span>
+            </div>
+          </div>
         </div>
-      </div>
 
-      {/* Main Two-Column Layout */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column: Active Proposal */}
-          <div className="lg:col-span-7 space-y-8">
+        {/* ── Stats row ── */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+          {STATS.map((stat) => (
+            <div key={stat.label} className="stat-card">
+              <div className="text-[11px] font-medium mb-1" style={{ color: "#4b7a54" }}>
+                {stat.label}
+              </div>
+              <div className="text-xl font-bold font-mono mb-0.5" style={{ color: "#f0fdf0" }}>
+                {stat.value}
+              </div>
+              <div className="text-[11px]" style={{ color: "#4ade80" }}>{stat.delta}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* ── Search bar ── */}
+        <div className="relative mb-6">
+          <Search
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4"
+            style={{ color: "#4b7a54" }}
+          />
+          <input
+            type="text"
+            placeholder="Search address, tx hash, block, proposal ID..."
+            className="search-input"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <span
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] px-1.5 py-0.5 rounded font-mono"
+            style={{ background: "rgba(74,222,128,0.08)", color: "#4b7a54", border: "1px solid rgba(74,222,128,0.12)" }}
+          >
+            /
+          </span>
+        </div>
+
+        {/* ── Main Two-Column Layout ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-5">
+          <div className="lg:col-span-7">
             <ProposalCard proposal={proposal} />
           </div>
-
-          {/* Right Column: Confidential Voting Booth */}
-          <div className="lg:col-span-5 space-y-8">
+          <div className="lg:col-span-5">
             <VotingBooth
               wallet={wallet}
               onCastVote={handleCastVote}
@@ -111,33 +151,38 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Full-Width Section 1: Privacy Architecture Inspector */}
-        <ProofVisualizer />
+        {/* ── Proof Visualizer ── */}
+        <div className="mb-5">
+          <ProofVisualizer />
+        </div>
 
-        {/* Full-Width Section 2: Live Anonymous Governance Ledger */}
-        <ActivityLedger activities={activities} />
+        {/* ── Activity Ledger (Transactions table) ── */}
+        <div className="mb-5">
+          <ActivityLedger activities={activities} />
+        </div>
 
-        {/* Full-Width Section 3: Compact Smart Contract Viewer */}
-        <CompactCircuitViewer />
+        {/* ── Compact Circuit Viewer (Blocks-style panel) ── */}
+        <div className="mb-5">
+          <CompactCircuitViewer />
+        </div>
       </div>
 
-      {/* ZK Proof Progress Stepper Modal */}
-      <ZKProofModal
-        isOpen={isModalOpen}
-        progress={proofProgress}
-        onClose={() => setIsModalOpen(false)}
-      />
+      {/* ZK Proof Modal */}
+      <ZKProofModal isOpen={isModalOpen} progress={proofProgress} onClose={() => setIsModalOpen(false)} />
 
       {/* Footer */}
-      <footer className="mt-20 border-t border-white/10 pt-8 pb-12 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center space-x-2">
-            <Shield className="w-4 h-4 text-lunar-teal" />
-            <span className="font-bold text-slate-400">VoxMidnight Protocol</span>
-            <span>— Level-3 Compliant Midnight dApp</span>
+      <footer
+        className="mt-12 py-6"
+        style={{ borderTop: "1px solid rgba(74,222,128,0.08)" }}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Shield className="w-3.5 h-3.5" style={{ color: "#4ade80" }} />
+            <span className="text-xs font-semibold" style={{ color: "#86efac" }}>VoxMidnight Protocol</span>
+            <span className="text-xs" style={{ color: "#4b7a54" }}>— Level-3 Compliant Midnight dApp</span>
           </div>
-          <div className="font-mono text-slate-500">
-            Powered by Compact DSL • Halo2 Prover • Lace Preprod Connector
+          <div className="text-xs font-mono" style={{ color: "#2d5c36" }}>
+            Compact DSL • Halo2 Prover • Lace Preprod Connector
           </div>
         </div>
       </footer>

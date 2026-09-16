@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { CheckCircle2, XCircle, ShieldCheck, KeyRound, Lock, Sparkles, AlertCircle, Cpu, Vote, RefreshCw } from "lucide-react";
+import { CheckCircle2, XCircle, ShieldCheck, KeyRound, Lock, AlertCircle, Cpu, Vote, RefreshCw } from "lucide-react";
 import { WalletState } from "../midnight/types";
 
 interface VotingBoothProps {
@@ -11,18 +11,12 @@ interface VotingBoothProps {
   onConnectWallet: () => void;
 }
 
-export const VotingBooth: React.FC<VotingBoothProps> = ({
-  wallet,
-  onCastVote,
-  isVoting,
-  onConnectWallet,
-}) => {
+export const VotingBooth: React.FC<VotingBoothProps> = ({ wallet, onCastVote, isVoting, onConnectWallet }) => {
   const [selectedChoice, setSelectedChoice] = useState<boolean | null>(null);
   const [secretEntropyHex, setSecretEntropyHex] = useState<string>("");
   const [secretBytes, setSecretBytes] = useState<Uint8Array>(new Uint8Array(32));
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // Generate randomized entropy salt on mount or reset
   const generateNewEntropy = () => {
     const bytes = new Uint8Array(32);
     if (typeof window !== "undefined" && window.crypto) {
@@ -31,30 +25,17 @@ export const VotingBooth: React.FC<VotingBoothProps> = ({
       for (let i = 0; i < 32; i++) bytes[i] = Math.floor(Math.random() * 256);
     }
     setSecretBytes(bytes);
-    const hex = Array.from(bytes)
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
-    setSecretEntropyHex(hex);
+    setSecretEntropyHex(Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join(""));
   };
 
-  useEffect(() => {
-    generateNewEntropy();
-  }, []);
+  useEffect(() => { generateNewEntropy(); }, []);
 
   const handleVoteSubmission = async () => {
-    if (selectedChoice === null) {
-      setErrorMsg("Please select your governance decision (Approve or Reject).");
-      return;
-    }
-    if (!wallet.isConnected) {
-      onConnectWallet();
-      return;
-    }
-
+    if (selectedChoice === null) { setErrorMsg("Select your governance decision first."); return; }
+    if (!wallet.isConnected) { onConnectWallet(); return; }
     setErrorMsg(null);
     try {
       await onCastVote(selectedChoice, secretBytes);
-      // Reset after vote
       generateNewEntropy();
     } catch (err: any) {
       setErrorMsg(err?.message || "Failed to execute zero-knowledge vote transaction.");
@@ -62,175 +43,213 @@ export const VotingBooth: React.FC<VotingBoothProps> = ({
   };
 
   return (
-    <div className="glass-panel-glow rounded-3xl p-6 sm:p-8 border border-lunar-teal/30 relative overflow-hidden shadow-2xl">
-      {/* Ambient background glow */}
-      <div className="absolute -top-10 -left-10 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-
-      {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-white/10">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-2xl bg-lunar-teal/15 border border-lunar-teal/40 flex items-center justify-center">
-            <Vote className="w-5 h-5 text-lunar-teal" />
+    <div
+      className="card-flat"
+      style={{ borderRadius: "16px", overflow: "hidden" }}
+    >
+      {/* ── Header ── */}
+      <div
+        className="px-6 py-4 flex items-center justify-between"
+        style={{ borderBottom: "1px solid rgba(74,222,128,0.08)" }}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center"
+            style={{ background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.2)" }}
+          >
+            <Vote className="w-4 h-4" style={{ color: "#4ade80" }} />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-white tracking-tight flex items-center space-x-2">
-              <span>Confidential Voting Booth</span>
-              <span className="px-2 py-0.5 text-[9px] uppercase tracking-wider font-mono rounded bg-lunar-teal/20 text-lunar-teal border border-lunar-teal/40">
-                ZK Sandbox
+            <h3 className="text-sm font-bold" style={{ color: "#f0fdf0" }}>
+              Confidential Voting Booth
+              <span
+                className="ml-2 text-[9px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded"
+                style={{ background: "rgba(74,222,128,0.1)", color: "#4ade80", border: "1px solid rgba(74,222,128,0.2)" }}
+              >
+                ZK Circuit
               </span>
             </h3>
-            <p className="text-xs text-slate-400">Zero-Knowledge Witness Evaluation</p>
+            <p className="text-xs" style={{ color: "#4b7a54" }}>Zero-Knowledge witness evaluation</p>
           </div>
         </div>
-
-        <div className="flex items-center space-x-2 text-xs font-mono text-slate-400">
-          <Lock className="w-3.5 h-3.5 text-lunar-teal" />
-          <span>Client-Side Proving</span>
+        <div className="flex items-center gap-1.5 text-xs" style={{ color: "#4b7a54", fontFamily: "'JetBrains Mono', monospace" }}>
+          <Lock className="w-3 h-3" style={{ color: "#4ade80" }} />
+          <span>Client-side proving</span>
         </div>
       </div>
 
-      {/* Choice Selection Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-        {/* Approve Option */}
-        <button
-          type="button"
-          onClick={() => setSelectedChoice(true)}
-          className={`p-5 rounded-2xl border text-left transition-all relative overflow-hidden group ${
-            selectedChoice === true
-              ? "bg-emerald-500/15 border-emerald-400 glow-teal"
-              : "bg-obsidian-800/80 border-white/10 hover:border-emerald-500/40 hover:bg-obsidian-800"
-          }`}
-        >
-          <div className="flex items-start justify-between mb-3">
-            <div className="flex items-center space-x-2.5">
-              <div
-                className={`w-8 h-8 rounded-xl flex items-center justify-center transition ${
-                  selectedChoice === true ? "bg-emerald-500 text-obsidian-950" : "bg-emerald-500/20 text-emerald-400"
-                }`}
-              >
-                <CheckCircle2 className="w-4 h-4 font-bold" />
-              </div>
-              <span className="text-base font-bold text-white group-hover:text-emerald-300 transition">
-                APPROVE (YES)
-              </span>
-            </div>
-            <div
-              className={`w-5 h-5 rounded-full border flex items-center justify-center ${
-                selectedChoice === true
-                  ? "border-emerald-400 bg-emerald-400"
-                  : "border-slate-600 group-hover:border-slate-400"
-              }`}
-            >
-              {selectedChoice === true && <div className="w-2 h-2 rounded-full bg-obsidian-950" />}
-            </div>
-          </div>
-
-          <p className="text-xs text-slate-400 leading-normal mb-3">
-            Vote in favor of MIP-042 threshold sharded indexing architecture upgrade.
-          </p>
-
-          <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[10px] font-mono text-slate-400">
-            <span className="text-emerald-400 font-semibold">Private Witness: true</span>
-            <span>State: yesCount +1</span>
-          </div>
-        </button>
-
-        {/* Reject Option */}
-        <button
-          type="button"
-          onClick={() => setSelectedChoice(false)}
-          className={`p-5 rounded-2xl border text-left transition-all relative overflow-hidden group ${
-            selectedChoice === false
-              ? "bg-rose-500/15 border-rose-400 glow-rose"
-              : "bg-obsidian-800/80 border-white/10 hover:border-rose-500/40 hover:bg-obsidian-800"
-          }`}
-        >
-          <div className="flex items-start justify-between mb-3">
-            <div className="flex items-center space-x-2.5">
-              <div
-                className={`w-8 h-8 rounded-xl flex items-center justify-center transition ${
-                  selectedChoice === false ? "bg-rose-500 text-white" : "bg-rose-500/20 text-rose-400"
-                }`}
-              >
-                <XCircle className="w-4 h-4 font-bold" />
-              </div>
-              <span className="text-base font-bold text-white group-hover:text-rose-300 transition">
-                REJECT (NO)
-              </span>
-            </div>
-            <div
-              className={`w-5 h-5 rounded-full border flex items-center justify-center ${
-                selectedChoice === false
-                  ? "border-rose-400 bg-rose-400"
-                  : "border-slate-600 group-hover:border-slate-400"
-              }`}
-            >
-              {selectedChoice === false && <div className="w-2 h-2 rounded-full bg-white" />}
-            </div>
-          </div>
-
-          <p className="text-xs text-slate-400 leading-normal mb-3">
-            Vote against proposal and request further technical review on threshold parameters.
-          </p>
-
-          <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[10px] font-mono text-slate-400">
-            <span className="text-rose-400 font-semibold">Private Witness: false</span>
-            <span>State: noCount +1</span>
-          </div>
-        </button>
-      </div>
-
-      {/* Confidential Entropy Witness Box */}
-      <div className="mb-6 p-4 rounded-2xl bg-obsidian-900/90 border border-white/10">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center space-x-2">
-            <KeyRound className="w-3.5 h-3.5 text-lunar-teal" />
-            <span className="text-xs font-bold text-slate-300">Confidential Voter Entropy Salt (Local Witness)</span>
-          </div>
+      <div className="p-5 space-y-4">
+        {/* ── Vote Choice Cards ── */}
+        <div className="grid grid-cols-2 gap-3">
+          {/* APPROVE */}
           <button
-            onClick={generateNewEntropy}
-            className="flex items-center space-x-1 text-[11px] text-lunar-teal hover:text-cyan-300 transition"
+            type="button"
+            onClick={() => setSelectedChoice(true)}
+            className="p-4 rounded-xl text-left transition-all"
+            style={{
+              background: selectedChoice === true ? "rgba(74,222,128,0.1)" : "rgba(255,255,255,0.02)",
+              border: `1px solid ${selectedChoice === true ? "rgba(74,222,128,0.4)" : "rgba(74,222,128,0.08)"}`,
+              boxShadow: selectedChoice === true ? "0 0 16px rgba(74,222,128,0.12)" : "none",
+            }}
           >
-            <RefreshCw className="w-3 h-3" />
-            <span>Re-roll Salt</span>
+            <div className="flex items-center justify-between mb-2">
+              <div
+                className="w-7 h-7 rounded-lg flex items-center justify-center"
+                style={{
+                  background: selectedChoice === true ? "#4ade80" : "rgba(74,222,128,0.12)",
+                }}
+              >
+                <CheckCircle2
+                  className="w-4 h-4"
+                  style={{ color: selectedChoice === true ? "#0a0f0a" : "#4ade80" }}
+                />
+              </div>
+              <div
+                className="w-4 h-4 rounded-full border-2 flex items-center justify-center"
+                style={{
+                  borderColor: selectedChoice === true ? "#4ade80" : "rgba(74,222,128,0.2)",
+                  background: selectedChoice === true ? "#4ade80" : "transparent",
+                }}
+              >
+                {selectedChoice === true && <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#0a0f0a" }} />}
+              </div>
+            </div>
+            <div className="text-sm font-bold mb-1" style={{ color: "#4ade80" }}>APPROVE</div>
+            <div className="text-[11px] leading-relaxed" style={{ color: "#4b7a54" }}>
+              Vote in favor — MIP-042 upgrade
+            </div>
+            <div
+              className="mt-2 pt-2 text-[10px] font-mono"
+              style={{ borderTop: "1px solid rgba(74,222,128,0.08)", color: "#4b7a54" }}
+            >
+              witness: <span style={{ color: "#4ade80" }}>true</span> → yesCount +1
+            </div>
+          </button>
+
+          {/* REJECT */}
+          <button
+            type="button"
+            onClick={() => setSelectedChoice(false)}
+            className="p-4 rounded-xl text-left transition-all"
+            style={{
+              background: selectedChoice === false ? "rgba(239,68,68,0.08)" : "rgba(255,255,255,0.02)",
+              border: `1px solid ${selectedChoice === false ? "rgba(239,68,68,0.35)" : "rgba(74,222,128,0.08)"}`,
+              boxShadow: selectedChoice === false ? "0 0 16px rgba(239,68,68,0.1)" : "none",
+            }}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div
+                className="w-7 h-7 rounded-lg flex items-center justify-center"
+                style={{
+                  background: selectedChoice === false ? "#ef4444" : "rgba(239,68,68,0.12)",
+                }}
+              >
+                <XCircle
+                  className="w-4 h-4"
+                  style={{ color: selectedChoice === false ? "#fff" : "#f87171" }}
+                />
+              </div>
+              <div
+                className="w-4 h-4 rounded-full border-2 flex items-center justify-center"
+                style={{
+                  borderColor: selectedChoice === false ? "#ef4444" : "rgba(74,222,128,0.2)",
+                  background: selectedChoice === false ? "#ef4444" : "transparent",
+                }}
+              >
+                {selectedChoice === false && <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#fff" }} />}
+              </div>
+            </div>
+            <div className="text-sm font-bold mb-1" style={{ color: "#f87171" }}>REJECT</div>
+            <div className="text-[11px] leading-relaxed" style={{ color: "#4b7a54" }}>
+              Against — request further review
+            </div>
+            <div
+              className="mt-2 pt-2 text-[10px] font-mono"
+              style={{ borderTop: "1px solid rgba(74,222,128,0.08)", color: "#4b7a54" }}
+            >
+              witness: <span style={{ color: "#f87171" }}>false</span> → noCount +1
+            </div>
           </button>
         </div>
 
-        <div className="p-2 rounded-lg bg-obsidian-950 font-mono text-[11px] text-slate-400 break-all select-all border border-white/5 flex items-center justify-between">
-          <span>0x{secretEntropyHex.slice(0, 32)}...{secretEntropyHex.slice(-16)}</span>
-          <span className="px-2 py-0.5 rounded bg-lunar-teal/10 text-lunar-teal text-[10px] font-semibold">256-bit</span>
+        {/* ── Entropy Salt Box ── */}
+        <div
+          className="p-4 rounded-xl"
+          style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(74,222,128,0.08)" }}
+        >
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <KeyRound className="w-3.5 h-3.5" style={{ color: "#4ade80" }} />
+              <span className="text-xs font-semibold" style={{ color: "#86efac" }}>
+                Entropy Salt (Local Witness)
+              </span>
+            </div>
+            <button
+              onClick={generateNewEntropy}
+              className="flex items-center gap-1 text-[11px] transition-colors"
+              style={{ color: "#4b7a54" }}
+            >
+              <RefreshCw className="w-3 h-3" />
+              <span>Re-roll</span>
+            </button>
+          </div>
+          <div
+            className="p-2 rounded-lg text-[11px] break-all font-mono flex items-center justify-between"
+            style={{
+              background: "rgba(0,0,0,0.3)",
+              border: "1px solid rgba(74,222,128,0.06)",
+              color: "#4b7a54",
+            }}
+          >
+            <span>0x{secretEntropyHex.slice(0, 28)}...{secretEntropyHex.slice(-12)}</span>
+            <span
+              className="shrink-0 ml-2 px-1.5 py-0.5 rounded text-[10px] font-bold"
+              style={{ background: "rgba(74,222,128,0.1)", color: "#4ade80" }}
+            >
+              256-bit
+            </span>
+          </div>
+          <p className="text-[10px] mt-1.5" style={{ color: "#2d5c36" }}>
+            Never broadcasted. Used to derive anonymous single-use nullifier.
+          </p>
         </div>
-        <p className="text-[11px] text-slate-500 mt-2 font-light">
-          This entropy salt is used to derive your anonymous single-use nullifier. It is NEVER broadcasted to the public ledger.
-        </p>
+
+        {/* ── Error ── */}
+        {errorMsg && (
+          <div
+            className="p-3 rounded-xl flex items-center gap-2.5 text-xs"
+            style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "#f87171" }}
+          >
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+        )}
+
+        {/* ── Submit Button ── */}
+        <button
+          type="button"
+          onClick={handleVoteSubmission}
+          disabled={isVoting}
+          className="w-full py-3.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2.5"
+          style={{
+            background: isVoting ? "rgba(74,222,128,0.3)" : "#4ade80",
+            color: "#0a0f0a",
+            boxShadow: isVoting ? "none" : "0 0 20px rgba(74,222,128,0.25)",
+            opacity: isVoting ? 0.7 : 1,
+          }}
+        >
+          <Cpu className="w-4 h-4" />
+          <span>
+            {isVoting
+              ? "Synthesizing ZK Proof..."
+              : !wallet.isConnected
+              ? "Connect wallet to vote"
+              : selectedChoice === null
+              ? "Select your choice"
+              : "Cast Confidential Ballot"}
+          </span>
+        </button>
       </div>
-
-      {/* Error Message */}
-      {errorMsg && (
-        <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center space-x-2.5 text-rose-300 text-xs">
-          <AlertCircle className="w-4 h-4 flex-shrink-0" />
-          <span>{errorMsg}</span>
-        </div>
-      )}
-
-      {/* Cast Ballot Trigger */}
-      <button
-        type="button"
-        onClick={handleVoteSubmission}
-        disabled={isVoting}
-        className="w-full py-4 rounded-2xl bg-gradient-to-r from-lunar-teal via-cyan-400 to-lunar-teal text-obsidian-950 font-black text-sm tracking-wide uppercase hover:opacity-95 transition-all shadow-[0_0_25px_rgba(0,242,254,0.35)] active:scale-[0.99] disabled:opacity-50 flex items-center justify-center space-x-2.5"
-      >
-        <Cpu className="w-4 h-4" />
-        <span>
-          {isVoting
-            ? "Synthesizing Zero-Knowledge Proof..."
-            : !wallet.isConnected
-            ? "Connect Lace Wallet to Cast Vote"
-            : selectedChoice === null
-            ? "Select Choice to Cast Encrypted Ballot"
-            : "Cast Confidential Ballot (ZK Witness)"}
-        </span>
-      </button>
     </div>
   );
 };

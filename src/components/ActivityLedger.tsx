@@ -1,82 +1,148 @@
 "use client";
 
 import React from "react";
-import { History, ShieldCheck, ExternalLink, ArrowUpRight, Blocks, Hash } from "lucide-react";
+import { History, ShieldCheck, ArrowUpRight, ExternalLink } from "lucide-react";
 import { VoteActivity } from "../midnight/types";
 
 interface ActivityLedgerProps {
   activities: VoteActivity[];
 }
 
+const ACTION_TYPES = ["castVote", "zkProof", "nullify", "castVote", "castVote", "zkProof"];
+
 export const ActivityLedger: React.FC<ActivityLedgerProps> = ({ activities }) => {
   return (
-    <div className="glass-panel rounded-3xl p-6 sm:p-8 border border-white/10 shadow-2xl">
-      {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-white/10">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-2xl bg-lunar-teal/15 border border-lunar-teal/30 flex items-center justify-center">
-            <History className="w-5 h-5 text-lunar-teal" />
+    <div className="card-flat" style={{ borderRadius: "16px", overflow: "hidden" }}>
+      {/* ── Header ── */}
+      <div
+        className="px-6 py-4 flex items-center justify-between"
+        style={{ borderBottom: "1px solid rgba(74,222,128,0.08)" }}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center"
+            style={{ background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.2)" }}
+          >
+            <History className="w-4 h-4" style={{ color: "#4ade80" }} />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-white tracking-tight flex items-center space-x-2">
-              <span>Live Anonymous Governance Ledger</span>
-              <span className="flex h-2 w-2 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+            <h3 className="text-sm font-bold flex items-center gap-2" style={{ color: "#f0fdf0" }}>
+              Transactions
+              <span className="flex h-1.5 w-1.5 relative">
+                <span
+                  className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+                  style={{ background: "#4ade80" }}
+                />
+                <span
+                  className="relative inline-flex rounded-full h-1.5 w-1.5"
+                  style={{ background: "#4ade80" }}
+                />
               </span>
             </h3>
-            <p className="text-xs text-slate-400">Preprod Consensus Activity & Verifiable Proof Log</p>
+            <p className="text-xs" style={{ color: "#4b7a54" }}>Live anonymous ballot ledger</p>
           </div>
         </div>
-
-        <div className="text-xs font-mono text-slate-400">
-          Total Recorded: <span className="text-white font-bold">{activities.length} Events</span>
-        </div>
+        <button className="text-xs font-semibold" style={{ color: "#4ade80" }}>
+          See all
+        </button>
       </div>
 
-      {/* Activity Table / List */}
-      <div className="space-y-3">
-        {activities.map((act) => (
-          <div
-            key={act.id}
-            className="p-4 rounded-2xl bg-obsidian-900/90 border border-white/5 hover:border-lunar-teal/30 transition-all flex flex-col md:flex-row md:items-center justify-between gap-3"
-          >
-            {/* Tx & Nullifier Info */}
-            <div className="space-y-1">
-              <div className="flex items-center space-x-2">
-                <span className="px-2 py-0.5 rounded bg-obsidian-800 text-[10px] font-mono font-bold text-slate-300 border border-white/10">
-                  Block #{act.blockHeight}
-                </span>
-                <span className="font-mono text-xs font-bold text-slate-200">
-                  {act.txHash.slice(0, 14)}...{act.txHash.slice(-8)}
-                </span>
-                <span className="text-slate-500 text-xs">• {act.timestamp}</span>
-              </div>
+      {/* ── Table ── */}
+      <div className="overflow-x-auto">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Transaction Hash</th>
+              <th>Action</th>
+              <th>Block</th>
+              <th>Nullifier</th>
+              <th>Status</th>
+              <th>Age</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            {activities.map((act, idx) => {
+              const actionType = ACTION_TYPES[idx % ACTION_TYPES.length];
+              return (
+                <tr key={act.id}>
+                  {/* Tx Hash */}
+                  <td>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-6 h-6 rounded flex items-center justify-center shrink-0"
+                        style={{ background: "rgba(74,222,128,0.08)" }}
+                      >
+                        <ShieldCheck className="w-3 h-3" style={{ color: "#4ade80" }} />
+                      </div>
+                      <span style={{ color: "#86efac" }}>
+                        {act.txHash.slice(0, 10)}...{act.txHash.slice(-6)}
+                      </span>
+                    </div>
+                  </td>
 
-              <div className="flex items-center space-x-2 text-[11px] font-mono text-slate-400">
-                <span className="text-slate-500">Nullifier:</span>
-                <span className="text-lunar-teal font-medium">{act.nullifierCommitment}</span>
-              </div>
-            </div>
+                  {/* Action badge */}
+                  <td>
+                    <span
+                      className={`action-badge ${
+                        actionType === "castVote"
+                          ? "action-vote"
+                          : actionType === "zkProof"
+                          ? "action-proof"
+                          : "action-nullify"
+                      }`}
+                    >
+                      {actionType === "castVote"
+                        ? "castBallot"
+                        : actionType === "zkProof"
+                        ? "zkVerify"
+                        : "nullify"}
+                    </span>
+                  </td>
 
-            {/* Proof Status Badge */}
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-1.5 px-3 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-medium">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span>ZK-Proof Verified</span>
-              </div>
+                  {/* Block */}
+                  <td style={{ color: "#86efac" }}>#{act.blockHeight}</td>
 
-              <button
-                type="button"
-                onClick={() => alert(`Preprod Explorer Transaction: ${act.txHash}`)}
-                className="p-2 rounded-xl bg-obsidian-800 hover:bg-obsidian-700 text-slate-400 hover:text-white transition border border-white/5"
-                title="View on Preprod Indexer"
-              >
-                <ArrowUpRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        ))}
+                  {/* Nullifier */}
+                  <td>
+                    <span style={{ color: "#4b7a54", fontSize: "11px" }}>
+                      {act.nullifierCommitment.slice(0, 14)}...
+                    </span>
+                  </td>
+
+                  {/* Verified */}
+                  <td>
+                    {act.isVerified ? (
+                      <span className="badge-green" style={{ fontSize: "11px" }}>
+                        <ShieldCheck className="w-3 h-3" />
+                        Verified
+                      </span>
+                    ) : (
+                      <span className="badge-outline" style={{ fontSize: "11px" }}>
+                        Pending
+                      </span>
+                    )}
+                  </td>
+
+                  {/* Age */}
+                  <td style={{ color: "#4b7a54", fontSize: "12px" }}>{act.timestamp}</td>
+
+                  {/* Link */}
+                  <td>
+                    <button
+                      onClick={() => alert(`Preprod Explorer: ${act.txHash}`)}
+                      className="p-1.5 rounded transition-colors"
+                      style={{ color: "#4b7a54" }}
+                      title="View on Explorer"
+                    >
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   );

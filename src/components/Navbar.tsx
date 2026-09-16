@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Shield, Radio, Wallet, CheckCircle2, ChevronDown, Copy, ExternalLink, Zap, ShieldCheck } from "lucide-react";
+import { Shield, Radio, Wallet, CheckCircle2, ChevronDown, Copy, Moon, Bell, ExternalLink, ShieldCheck } from "lucide-react";
 import { WalletState } from "../midnight/types";
 
 interface NavbarProps {
@@ -22,89 +22,149 @@ export const Navbar: React.FC<NavbarProps> = ({ wallet, onConnect, onDisconnect 
     }
   };
 
+  const navLinks = [
+    { label: "Overview", href: "#overview", active: true },
+    { label: "Proposals", href: "#proposals" },
+    { label: "Ballots", href: "#ballots" },
+    { label: "ZK Proofs", href: "#proofs" },
+  ];
+
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-obsidian-950/80 backdrop-blur-xl">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-        {/* Brand / Logo */}
-        <div className="flex items-center space-x-3.5">
-          <div className="relative flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-500/20 to-lunar-teal/20 border border-lunar-teal/40 shadow-[0_0_15px_rgba(0,242,254,0.2)]">
-            <Shield className="w-6 h-6 text-lunar-teal animate-pulse" />
-            <span className="absolute -top-1 -right-1 flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-lunar-teal opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-lunar-teal"></span>
-            </span>
-          </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <span className="text-xl font-black tracking-tight text-white">VOX</span>
-              <span className="text-xl font-bold tracking-tight text-gradient-teal">MIDNIGHT</span>
-              <span className="px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider rounded-md bg-lunar-teal/15 text-lunar-teal border border-lunar-teal/30">
-                L3 Privacy DApp
-              </span>
+    <header className="navbar">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        {/* Brand */}
+        <div className="flex items-center gap-8">
+          <a href="#" className="flex items-center gap-2.5 shrink-0">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "rgba(74,222,128,0.15)", border: "1px solid rgba(74,222,128,0.3)" }}>
+              <Shield className="w-4 h-4" style={{ color: "#4ade80" }} />
             </div>
-            <p className="text-xs text-slate-400 font-medium">Private On-Chain Governance Protocol</p>
-          </div>
+            <span className="font-bold text-base tracking-tight" style={{ color: "#f0fdf0" }}>
+              Vox<span style={{ color: "#4ade80" }}>Midnight</span>
+            </span>
+          </a>
+
+          {/* Nav Links */}
+          <nav className="hidden md:flex items-center gap-1">
+            {navLinks.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                className="px-3 py-1.5 rounded-md text-sm font-medium transition-all"
+                style={{
+                  color: link.active ? "#4ade80" : "#4b7a54",
+                  background: link.active ? "rgba(74,222,128,0.08)" : "transparent",
+                }}
+                onMouseEnter={(e) => {
+                  if (!link.active) (e.currentTarget as HTMLElement).style.color = "#86efac";
+                }}
+                onMouseLeave={(e) => {
+                  if (!link.active) (e.currentTarget as HTMLElement).style.color = "#4b7a54";
+                }}
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
         </div>
 
-        {/* Network Badge & Wallet Controls */}
-        <div className="flex items-center space-x-3 sm:space-x-4">
-          {/* Midnight Network Preprod Indicator */}
-          <div className="hidden md:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-obsidian-800/90 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
-            <Radio className="w-3.5 h-3.5 animate-pulse text-emerald-400" />
-            <span>Midnight Preprod</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+        {/* Right side controls */}
+        <div className="flex items-center gap-2">
+          {/* Network badge */}
+          <div
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold cursor-pointer"
+            style={{ border: "1px solid rgba(255,255,255,0.08)", color: "#86efac", background: "transparent" }}
+          >
+            <span className="live-dot" />
+            <span>Preprod</span>
+            <ChevronDown className="w-3 h-3 ml-0.5" style={{ color: "#4b7a54" }} />
           </div>
 
-          {/* Wallet State Button */}
+          {/* Dark mode icon */}
+          <button className="btn-ghost p-2 rounded-md" style={{ padding: "8px" }}>
+            <Moon className="w-4 h-4" style={{ color: "#4b7a54" }} />
+          </button>
+
+          {/* Notification icon */}
+          <button className="btn-ghost p-2 rounded-md relative" style={{ padding: "8px" }}>
+            <Bell className="w-4 h-4" style={{ color: "#4b7a54" }} />
+            <span
+              className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full"
+              style={{ background: "#4ade80" }}
+            />
+          </button>
+
+          {/* Wallet */}
           {wallet.isConnected && wallet.account ? (
             <div className="relative">
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center space-x-2.5 px-4 py-2 rounded-xl bg-obsidian-800/90 border border-lunar-teal/40 text-slate-100 hover:border-lunar-teal transition-all shadow-sm"
+                className="flex items-center gap-2 text-sm font-semibold rounded-lg px-4 py-2"
+                style={{
+                  background: "rgba(74,222,128,0.1)",
+                  border: "1px solid rgba(74,222,128,0.3)",
+                  color: "#4ade80",
+                }}
               >
-                <div className="w-2 h-2 rounded-full bg-lunar-teal animate-ping" />
-                <span className="text-xs font-mono font-medium">
+                <span className="live-dot" style={{ width: "6px", height: "6px" }} />
+                <span className="font-mono text-xs">
                   {wallet.account.address.slice(0, 8)}...{wallet.account.address.slice(-6)}
                 </span>
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                <ChevronDown className="w-3.5 h-3.5" style={{ color: "#4b7a54" }} />
               </button>
 
-              {/* Dropdown Menu */}
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-72 rounded-2xl glass-panel-glow p-4 shadow-2xl z-50 animate-in fade-in slide-in-from-top-2">
-                  <div className="flex items-center justify-between pb-3 border-b border-white/10">
-                    <span className="text-xs font-semibold text-slate-400">Lace Preprod Session</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono">Connected</span>
+                <div
+                  className="absolute right-0 mt-2 w-72 rounded-xl p-4 z-50 shadow-2xl"
+                  style={{
+                    background: "var(--bg-card)",
+                    border: "1px solid rgba(74,222,128,0.25)",
+                    boxShadow: "0 20px 40px rgba(0,0,0,0.6)",
+                  }}
+                >
+                  <div className="flex items-center justify-between pb-3" style={{ borderBottom: "1px solid rgba(74,222,128,0.1)" }}>
+                    <span className="text-xs font-semibold" style={{ color: "#4b7a54" }}>Lace Preprod Session</span>
+                    <span className="badge-green text-[10px]">Connected</span>
                   </div>
 
-                  <div className="py-3 space-y-2">
+                  <div className="py-3 space-y-3">
                     <div>
-                      <div className="text-[11px] text-slate-400 mb-1">Voter Address</div>
-                      <div className="flex items-center justify-between p-2 rounded-lg bg-obsidian-900 border border-white/5 font-mono text-[11px] text-slate-300">
+                      <div className="text-[11px] mb-1" style={{ color: "#4b7a54" }}>Voter Address</div>
+                      <div
+                        className="flex items-center justify-between p-2 rounded-lg font-mono text-[11px]"
+                        style={{ background: "var(--bg-input)", border: "1px solid rgba(74,222,128,0.1)", color: "#86efac" }}
+                      >
                         <span className="truncate max-w-[180px]">{wallet.account.address}</span>
-                        <button onClick={copyAddress} className="text-slate-400 hover:text-lunar-teal ml-2">
-                          {copied ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        <button onClick={copyAddress} className="ml-2" style={{ color: "#4b7a54" }}>
+                          {copied ? (
+                            <CheckCircle2 className="w-3.5 h-3.5" style={{ color: "#4ade80" }} />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5" />
+                          )}
                         </button>
                       </div>
                     </div>
 
-                    <div className="flex justify-between items-center text-xs py-1">
-                      <span className="text-slate-400">Test Token Balance:</span>
-                      <span className="font-mono font-bold text-lunar-teal">{wallet.account.balanceTDU}</span>
+                    <div className="flex justify-between text-xs">
+                      <span style={{ color: "#4b7a54" }}>Test Token Balance:</span>
+                      <span className="font-mono font-bold" style={{ color: "#4ade80" }}>
+                        {wallet.account.balanceTDU}
+                      </span>
                     </div>
 
-                    <div className="flex items-center space-x-1.5 text-[11px] text-slate-400 pt-1">
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                    <div className="flex items-center gap-1.5 text-[11px]" style={{ color: "#4b7a54" }}>
+                      <ShieldCheck className="w-3.5 h-3.5" style={{ color: "#4ade80" }} />
                       <span>ZK Witness Prover: Active</span>
                     </div>
                   </div>
 
                   <button
-                    onClick={() => {
-                      setDropdownOpen(false);
-                      onDisconnect();
+                    onClick={() => { setDropdownOpen(false); onDisconnect(); }}
+                    className="w-full py-2 px-3 rounded-lg text-xs font-semibold transition-all"
+                    style={{
+                      background: "rgba(239,68,68,0.08)",
+                      border: "1px solid rgba(239,68,68,0.2)",
+                      color: "#f87171",
                     }}
-                    className="w-full mt-2 py-2 px-3 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 text-xs font-semibold transition"
                   >
                     Disconnect Wallet
                   </button>
@@ -115,10 +175,11 @@ export const Navbar: React.FC<NavbarProps> = ({ wallet, onConnect, onDisconnect 
             <button
               onClick={onConnect}
               disabled={wallet.isConnecting}
-              className="flex items-center space-x-2 px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-lunar-teal to-cyan-400 text-obsidian-950 font-bold text-xs sm:text-sm hover:opacity-95 transition-all shadow-[0_0_20px_rgba(0,242,254,0.3)] active:scale-95 disabled:opacity-50"
+              className="btn-primary"
+              style={{ opacity: wallet.isConnecting ? 0.6 : 1 }}
             >
-              <Wallet className="w-4 h-4 text-obsidian-950" />
-              <span>{wallet.isConnecting ? "Connecting Lace..." : "Connect Lace Wallet"}</span>
+              <Wallet className="w-4 h-4" />
+              <span>{wallet.isConnecting ? "Connecting..." : "Connect wallet"}</span>
             </button>
           )}
         </div>
