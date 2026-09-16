@@ -25,7 +25,7 @@ export class VoxMidnightClient {
     yesVotes: 142,
     noVotes: 23,
     totalVotes: 165,
-    contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "020089aef41c5d983e2e50529d8137ba93d0c268c1387d894819dcf47343e8a49c",
+    contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "a981220ce45583f2d9912ebaab5c33cc7a5546f3ff1ac036776d3972a43c5448",
   };
 
   private activities: VoteActivity[] = [
